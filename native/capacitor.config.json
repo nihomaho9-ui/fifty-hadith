@@ -1,0 +1,16 @@
+{
+  "appId": "com.nibras.arbaun",
+  "appName": "الأربعون النووية",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "adjustMarginsForEdgeToEdge": "disable",
+    "backgroundColor": "#f5f8f7",
+    "webContentsDebuggingEnabled": false
+  },
+  "server": {
+    "androidScheme": "https",
+    "hostname": "arbaun.app.local"
+  },
+  "plugins": {}
+}

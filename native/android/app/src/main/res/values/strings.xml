@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">الأربعون النووية</string>
+    <string name="title_activity_main">الأربعون النووية</string>
+    <string name="package_name">com.nibras.arbaun</string>
+    <string name="custom_url_scheme">com.nibras.arbaun</string>
+</resources>

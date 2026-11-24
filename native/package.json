@@ -1,0 +1,16 @@
+{
+  "name": "arbaun-android",
+  "private": true,
+  "version": "1.0.0",
+  "description": "الأربعون النووية – native Android shell (Capacitor 7) around the offline reader in the repo root",
+  "scripts": {
+    "prepare-web": "bash scripts/prepare-web.sh",
+    "sync": "npx cap sync android",
+    "build:android": "bash scripts/prepare-web.sh && npx cap sync android && bash scripts/build-release.sh"
+  },
+  "dependencies": {
+    "@capacitor/android": "7.6.10",
+    "@capacitor/cli": "7.6.10",
+    "@capacitor/core": "7.6.10"
+  }
+}

@@ -1,0 +1,81 @@
+apply plugin: 'com.android.application'
+
+def vCode = (project.findProperty('versionCode') ?: '1').toString().toInteger()
+def vName = (project.findProperty('versionName') ?: '1.0.0').toString()
+
+// Release signing. Keystore and passwords are never in this repo.
+// Env ARBAUN_SIGNING_PROPS points at a properties file outside the repo:
+//   storeFile, storePassword, keyAlias, keyPassword
+def sign = [:]
+if (System.getenv('ARBAUN_SIGNING_PROPS') && file(System.getenv('ARBAUN_SIGNING_PROPS')).exists()) {
+    def props = new Properties()
+    file(System.getenv('ARBAUN_SIGNING_PROPS')).withInputStream { props.load(it) }
+    sign.storeFile = props.getProperty('storeFile')
+    sign.storePassword = props.getProperty('storePassword')
+    sign.keyAlias = props.getProperty('keyAlias')
+    sign.keyPassword = props.getProperty('keyPassword') ?: props.getProperty('storePassword')
+}
+
+android {
+    namespace "com.nibras.arbaun"
+    compileSdk rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.nibras.arbaun"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode vCode
+        versionName vName
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        if (sign.storeFile) {
+            release {
+                storeFile file(sign.storeFile)
+                storePassword sign.storePassword
+                keyAlias sign.keyAlias
+                keyPassword sign.keyPassword
+            }
+        }
+    }
+    buildTypes {
+        release {
+            if (sign.storeFile) signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

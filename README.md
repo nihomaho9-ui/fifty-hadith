@@ -3,9 +3,11 @@
 قارئ عربي هادئ، بخلفية بيضاء، للأحاديث الخمسين (٤٢ للنووي و٨ زيادات لابن رجب). يعمل دون اتصال (PWA)، بلا حسابات ولا إعلانات ولا تتبّع.
 
 ## Features
-- Index of 50 headings (Nawawi / Ibn Rajab), Arabic search (diacritics/alef-insensitive), bookmarks, continue-reading.
+- Index of 50 headings (Nawawi / Ibn Rajab), Arabic search (diacritics/alef-insensitive), bookmarks/favourites, continue-reading.
+- Copy and share a hadith (system share sheet in the Android app), swipe between hadith.
+- Light / dark / system theme; Nibras blue-green branding; bundled fonts (Amiri for the text, Noto Kufi Arabic for the UI).
 - Reader: Prophet's words in deep green `#23634d`, divine speech (qudsi) `#2f4a6e`, Quran `#7a5a1e`; narrator/companion text neutral; prev/next, keyboard arrows.
-- Settings: font size 18–30 (default 22), stored in localStorage. Arabic About/Source, Terms, Privacy pages.
+- Settings: font size 18–34 (default 22) and theme, stored in localStorage. Arabic About/Source, Terms, Privacy pages.
 - No audio (rights unconfirmed). Data model can later accept per-hadith audio timestamps.
 
 ## Run
@@ -18,7 +20,17 @@ python3 tests/test_data.py
 JSDOM_DIR=/path/with/jsdom node tests/test_app.mjs
 ```
 
+## Android app (Capacitor 7)
+`native/` wraps the same files as an offline Android app, package `com.nibras.arbaun`, minSdk 24, target/compile SDK 36, **no permissions** (not even INTERNET).
+- `native/scripts/prepare-web.sh` copies `index.html`, `src/`, `fonts/`, `icon.svg` into `native/www` (no service worker in the app).
+- `MainActivity` draws edge-to-edge and passes the exact status/navigation-bar, cutout and keyboard insets to CSS (`--sat --sab --sal --sar --kb`); `NibrasPlugin` adds copy, share, bar colours for the theme. Back button walks the in-app history.
+```
+cd native && npm ci && bash scripts/prepare-web.sh && npx cap sync android
+ARBAUN_SIGNING_PROPS=/path/outside/repo/signing.properties bash scripts/build-release.sh
+```
+The signing properties file (storeFile, storePassword, keyAlias, keyPassword) and the keystore are kept outside the repo and are never committed.
+
 ## Content & licensing caveats
-- Code: MIT (see LICENSE). Font: Amiri, SIL OFL 1.1 (`fonts/OFL.txt`).
+- Code: MIT (see LICENSE). Fonts: Amiri (`fonts/OFL.txt`) and Noto Kufi Arabic subset (`fonts/OFL-NotoKufiArabic.txt`), both SIL OFL 1.1.
 - Hadith text: from IslamHouse (see `data/PROVENANCE.md`). Not covered by the MIT license; follow IslamHouse terms (attribution, no change in content; commercial use may need permission).
 - Diacritics are as in the source (incomplete in places). Speech colouring is editorial and not yet scholar-reviewed. Check against printed editions.

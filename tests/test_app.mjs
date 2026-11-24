@@ -21,4 +21,13 @@ go('#/settings');w.document.getElementById('inc').click();ok(w.localStorage.getI
 ok(w.document.documentElement.style.getPropertyValue('--fs')==='23px','font applied');
 go('#/h/50');ok(w.document.querySelector('.pager a.off'),'no next on 50');
 for(const p of ['about','terms','privacy']){go('#/'+p);ok($('.page h1').length===1,p)}
+// added: copy/share buttons, theme
+go('#/h/2');ok(w.document.getElementById('cp')&&w.document.getElementById('sh'),'copy/share buttons');
+ok(w.__FH.hadithText(w.HADITH_DATA.hadith[0]).startsWith('الحديث الأول'),'share text');
+ok(!/\ue000/.test(w.__FH.hadithText(w.HADITH_DATA.hadith[1])),'share text has no PUA');
+go('#/settings');w.document.querySelector('[data-th=dark]').click();ok(w.document.documentElement.getAttribute('data-theme')==='dark','dark theme');
+w.document.querySelector('[data-th=light]').click();ok(w.document.documentElement.getAttribute('data-theme')==='light','light theme');
+ok(w.localStorage.getItem('fh.theme')==='"light"','theme saved');
+go('#/');ok(w.document.getElementById('back').hidden===true,'no back on index');
+go('#/h/0');ok(w.location.hash==='#/','bad id goes home');
 console.log(fail?'UI tests FAILED':'UI tests OK');process.exit(fail?1:0);
