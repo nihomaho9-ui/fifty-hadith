@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
-def vCode = (project.findProperty('versionCode') ?: '1').toString().toInteger()
-def vName = (project.findProperty('versionName') ?: '1.0.0').toString()
+def vCode = (project.findProperty('versionCode') ?: '2').toString().toInteger()
+def vName = (project.findProperty('versionName') ?: '1.0.1').toString()
 
 // Release signing. Keystore and passwords are never in this repo.
 // Env ARBAUN_SIGNING_PROPS points at a properties file outside the repo:

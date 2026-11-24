@@ -1,7 +1,7 @@
 {
   "name": "arbaun-android",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "الأربعون النووية – native Android shell (Capacitor 7) around the offline reader in the repo root",
   "scripts": {
     "prepare-web": "bash scripts/prepare-web.sh",

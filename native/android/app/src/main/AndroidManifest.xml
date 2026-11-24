@@ -37,6 +37,13 @@
         </provider>
     </application>
 
+    <!-- Needed (Android 11+) to find the installed text-to-speech engines. Not a permission. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
+
     <!-- No permissions: all text, fonts and icons are inside the app (fully offline). -->
     <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
 </manifest>
