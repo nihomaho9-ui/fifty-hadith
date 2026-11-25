@@ -5,7 +5,7 @@ const {JSDOM}=require('jsdom');
 const html=fs.readFileSync('index.html','utf8').replace(/<script src="src\/(data|app).js"><\/script>/g,'');
 const dom=new JSDOM(html,{url:'http://localhost/',runScripts:'outside-only',pretendToBeVisual:true});
 const w=dom.window;w.scrollTo=()=>{};
-w.eval(fs.readFileSync('src/data.js','utf8'));w.eval(fs.readFileSync('src/privacy.js','utf8'));w.eval(fs.readFileSync('src/app.js','utf8'));
+w.eval(fs.readFileSync('src/data.js','utf8'));w.eval(fs.readFileSync('src/privacy.js','utf8'));w.eval(fs.readFileSync('src/audio.js','utf8'));w.eval(fs.readFileSync('src/app.js','utf8'));
 const $=s=>w.document.querySelectorAll(s);let fail=0;const ok=(c,m)=>{if(!c){console.log('FAIL',m);fail++}};
 const go=h=>{w.location.hash=h;w.dispatchEvent(new w.HashChangeEvent('hashchange'))};
 ok($('ol.list li').length===50,'index lists 50');ok($('.matn').length===0,'index has no full text');
@@ -33,7 +33,7 @@ go('#/h/0');ok(w.location.hash==='#/','bad id goes home');
 // 1.0.1: legend without the Prophet's-speech label, colouring kept; listen button; live size preview; privacy
 go('#/h/1');ok(!w.document.querySelector('.legend')||!/كلام النبي/.test(w.document.querySelector('.legend').textContent),'no prophet legend label');
 ok($('.matn .k-p').length>=1,'prophet colouring kept');
-ok(w.document.getElementById('pl')&&/استماع/.test(w.document.getElementById('pl').textContent),'listen button');
+ok(w.document.getElementById('pl')&&w.document.getElementById('pseek')&&/الأنصاري/.test(w.document.querySelector('.player').textContent),'audio player');
 ok($('[data-pi]').length===w.HADITH_DATA.hadith[0].paras.length,'paragraphs indexed for highlighting');
 go('#/settings');const r=w.document.getElementById('fsr');ok(r&&$('.sample .matn').length===1,'size slider + sample');
 r.value='30';r.dispatchEvent(new w.Event('input'));ok(w.document.documentElement.style.getPropertyValue('--fs')==='30px','slider applies size live');
@@ -42,6 +42,9 @@ ok(w.document.querySelector('a[href="#/privacy"]'),'privacy link in settings');
 go('#/privacy');ok($('.privacy .langs a').length===4&&/الخصوصية/.test(w.document.querySelector('.privacy h1').textContent),'privacy ar');
 go('#/privacy/az');ok(/Məxfilik/.test(w.document.querySelector('.privacy h1').textContent),'privacy az');
 ok(/nibrascode@gmail.com/.test(w.document.querySelector('.privacy').textContent),'privacy contact');
-{let bad=0,max=0;for(const h of w.HADITH_DATA.hadith){const c=w.__FH.speechChunks(h);if(c[0].pi!==-1)bad++;for(const x of c){if(!x.t||/[\ue000\uf000-\uf0ffﷺ]/.test(x.t))bad++;max=Math.max(max,x.t.length)}
-  const pis=new Set(c.map(x=>x.pi));if(pis.size!==h.paras.length+1)bad++}ok(!bad,'speech chunks clean, every paragraph read');ok(max<1500,'speech chunk size '+max)}
+// 1.0.2: bundled recordings, no Prophet label in the settings colour key
+{const A=w.AUDIO_DATA;let bad=0;for(let n=1;n<=50;n++){if(!A.files[n]||!fs.existsSync(A.files[n])||!(A.dur[n]>10))bad++}ok(!bad,'50 audio files with durations');}
+go('#/h/50');ok(w.document.getElementById('pseek')&&+w.document.getElementById('pseek').max>0,'seek range on 50');
+go('#/settings');ok(!/كلام النبي/.test(w.document.body.textContent),'no prophet label in settings');
+ok(w.document.querySelectorAll('[data-rate]').length===3,'speed setting');
 console.log(fail?'UI tests FAILED':'UI tests OK');process.exit(fail?1:0);
